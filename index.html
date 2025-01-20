@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeStream</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-y: hidden;
+        }
+
+        .video-container {
+            height: 100vh;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            position: relative;
+        }
+
+        .video-item {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            background: #111;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-actions {
+            position: absolute;
+            right: 16px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 2;
+        }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .action-button i {
+            font-size: 28px;
+        }
+
+        .action-count {
+            font-size: 14px;
+        }
+
+        .video-info {
+            position: absolute;
+            bottom: 80px;
+            left: 16px;
+            right: 80px;
+            z-index: 2;
+        }
+
+        .username {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .music-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            border-top: 1px solid #333;
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 3;
+        }
+
+        .nav-button {
+            color: #fff;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .nav-button.active {
+            opacity: 1;
+        }
+
+        /* Comments Modal */
+        .comments-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            height: 80vh;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            z-index: 4;
+            transition: bottom 0.3s ease-in-out;
+            color: #000;
+            padding: 20px;
+        }
+
+        .comments-modal.active {
+            bottom: 0;
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-username {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .liked {
+            color: #ff4040;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            display: none;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <div class="video-item">
+            <video class="video-player" controls autoplay loop>
+                <source src="https://github.com/Rays-Robotics/videos/raw/refs/heads/main/Welcome%20to%20ameritok!%20this%20is%20the%20first%20ever%20video!%20this%20is%20meant%20as%20a%20test.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-actions">
+                <button class="action-button like-button">
+                    <i class="fas fa-heart"></i>
+                    <span class="action-count">0</span>
+                </button>
+                <button class="action-button comments-button">
+                    <i class="fas fa-comment"></i>
+                    <span class="action-count">0</span>
+                </button>
+                <button class="action-button">
+                    <i class="fas fa-bookmark"></i>
+                    <span class="action-count">0</span>
+                </button>
+                <button class="action-button">
+                    <i class="fas fa-share"></i>
+                    <span class="action-count">0</span>
+                </button>
+            </div>
+            <div class="video-info">
+                <div class="username">@admin</div>
+                <div class="description">Welcome!</div>
+                <div class="music-info">
+                    <i class="fas fa-music"></i>
+                    <span>Original Sound - Admin</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-button active"><i class="fas fa-home"></i></button>
+        <button class="nav-button"><i class="fas fa-compass"></i></button>
+        <button class="nav-button"><i class="fas fa-plus-square"></i></button>
+        <button class="nav-button"><i class="fas fa-inbox"></i></button>
+        <button class="nav-button"><i class="fas fa-user"></i></button>
+    </nav>
+
+    <div class="modal-overlay"></div>
+    <div class="comments-modal">
+        <div class="comments-header">
+            <h3>Comments (0)</h3>
+            <button class="close-comments"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scrolling functionality
+            const container = document.querySelector('.video-container');
+            let isScrolling = false;
+            let startY = 0;
+            let currentVideo = 0;
+
+            container.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (isScrolling) return;
+                
+                const currentY = e.touches[0].clientY;
+                const diff = startY - currentY;
+                
+                if (Math.abs(diff) > 50) {
+                    isScrolling = true;
+                    const direction = diff > 0 ? 1 : -1;
+                    const nextVideo = currentVideo + direction;
+                    
+                    if (nextVideo >= 0 && nextVideo < document.querySelectorAll('.video-item').length) {
+                        currentVideo = nextVideo;
+                        container.scrollTo({
+                            top: currentVideo * window.innerHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                    
+                    setTimeout(() => {
+                        isScrolling = false;
+                    }, 500);
+                }
+            });
+
+            // Like button functionality
+            const likeButtons = document.querySelectorAll('.like-button');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const icon = button.querySelector('i');
+                    icon.classList.toggle('liked');
+                });
+            });
+
+            // Comments modal functionality
+            const commentsButtons = document.querySelectorAll('.comments-button');
+            const commentsModal = document.querySelector('.comments-modal');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const closeCommentsButton = document.querySelector('.close-comments');
+
+            commentsButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    commentsModal.classList.add('active');
+                    modalOverlay.classList.add('active');
+                });
+            });
+
+            closeCommentsButton.addEventListener('click', () => {
+                commentsModal.classList.remove('active');
+                modalOverlay.classList.remove('active');
+            });
+
+            modalOverlay.addEventListener('click', () => {
+                commentsModal.classList.remove('active');
+                modalOverlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
