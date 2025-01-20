@@ -1,0 +1,13 @@
+{
+  "start_url": "https://rays-robotics.github.io/AmeriTok/",
+  "dir": "auto",
+  "lang": "en",
+  "orientation": "portrait-primary",
+  "display": "fullscreen",
+  "name": "AmeriTok",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "short_name": "AmeriTok",
+  "id": "alpha",
+  "description": "An American made and FOSS alternative to TikTok. So tik tok, tiktok your times up!"
+}
